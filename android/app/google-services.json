@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "540798100677",
+    "project_id": "free-code-camp-notes-app",
+    "storage_bucket": "free-code-camp-notes-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:540798100677:android:8d9f8152feec67b38bbcac",
+        "android_client_info": {
+          "package_name": "com.example.catalog_app_tut"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "540798100677-dmr0if9sa3a5sajmge3agu7fib3gvbjg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8peVPssbfeY-nBQ-bP6ufDHpfgWO5WDQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "540798100677-dmr0if9sa3a5sajmge3agu7fib3gvbjg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "540798100677-l310hh99k1c4vsd8hobsmi6iafchi02d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.catalogAppTut"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
