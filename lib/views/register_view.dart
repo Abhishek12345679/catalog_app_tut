@@ -1,6 +1,6 @@
-import 'package:catalog_app_tut/firebase_options.dart';
+import 'package:catalog_app_tut/views/email_verification_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class RegisterView extends StatefulWidget {
@@ -35,60 +35,63 @@ class _RegisterViewState extends State<RegisterView> {
         backgroundColor: Colors.black,
         title: const Text('Register'),
       ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
+      body: Center(
+        child: Column(
+          children: [
+            TextField(
+              controller: _email,
+              decoration: const InputDecoration(
+                hintText: 'Email',
+              ),
+              autocorrect: false,
+              enableSuggestions: false,
+              keyboardType: TextInputType.emailAddress,
+            ),
+            TextField(
+              controller: _password,
+              decoration: const InputDecoration(
+                hintText: 'Password',
+              ),
+              obscureText: true,
+              autocorrect: false,
+              enableSuggestions: false,
+            ),
+            TextButton(
+              onPressed: () async {
+                try {
+                  final userCredential = await FirebaseAuth.instance
+                      .createUserWithEmailAndPassword(
+                    email: _email.text,
+                    password: _password.text,
+                  );
+                  if (kDebugMode) {
+                    print('user: $userCredential');
+                  }
+                  if (context.mounted) {
+                    // The If block solves this:  Don't use 'BuildContext's across async gaps. Try rewriting the code to not reference the 'BuildContext'.
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EmailVerificationView(),
+                      ),
+                    );
+                  }
+                } on FirebaseAuthException catch (e) {
+                  if (kDebugMode) {
+                    print(e.code);
+                  }
+                }
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.black),
+                foregroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.white),
+              ),
+              child: const Text('Register'),
+            )
+          ],
         ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return Center(
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _email,
-                      decoration: const InputDecoration(
-                        hintText: 'Email',
-                      ),
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    TextField(
-                      controller: _password,
-                      decoration: const InputDecoration(
-                        hintText: 'Password',
-                      ),
-                      obscureText: true,
-                      autocorrect: false,
-                      enableSuggestions: false,
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        try {
-                          final userCredential = await FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                            email: _email.text,
-                            password: _password.text,
-                          );
-                          print('user: $userCredential');
-                        } on FirebaseAuthException catch (e) {}
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateColor.resolveWith(
-                            (states) => Colors.black),
-                        foregroundColor: MaterialStateColor.resolveWith(
-                            (states) => Colors.white),
-                      ),
-                      child: const Text('Register'),
-                    )
-                  ],
-                ),
-              );
-            default:
-              return const Text('Loading...');
-          }
-        },
       ),
     );
   }
