@@ -88,15 +88,10 @@ class _LoginViewState extends State<LoginView> {
                     });
                   }
                 },
-                style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateColor.resolveWith((states) => Colors.black),
-                  foregroundColor:
-                      MaterialStateColor.resolveWith((states) => Colors.white),
-                ),
                 child: const Text('Login'),
               ),
               TextButton(
+                autofocus: true,
                 child: const Text('Create New Account'),
                 onPressed: () {
                   Navigator.pushAndRemoveUntil(
