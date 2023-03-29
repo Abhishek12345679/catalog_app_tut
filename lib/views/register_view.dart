@@ -1,4 +1,5 @@
 import 'package:catalog_app_tut/views/email_verification_view.dart';
+import 'package:catalog_app_tut/views/login_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +90,20 @@ class _RegisterViewState extends State<RegisterView> {
                     MaterialStateColor.resolveWith((states) => Colors.white),
               ),
               child: const Text('Register'),
+            ),
+            TextButton(
+              child: const Text('Already have an Account? Login'),
+              onPressed: () {
+                // To remove all the routes below the pushed route, use a RoutePredicate that always returns false (e.g. (Route<dynamic> route) => false).
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginView(),
+                  ),
+                  (route) => false,
+                );
+              },
             )
           ],
         ),

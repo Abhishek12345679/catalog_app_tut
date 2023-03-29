@@ -99,11 +99,12 @@ class _LoginViewState extends State<LoginView> {
               TextButton(
                 child: const Text('Create New Account'),
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const RegisterView(),
                     ),
+                    (route) => false,
                   );
                 },
               )

@@ -26,6 +26,7 @@ class EmailVerificationView extends StatelessWidget {
               child: const Text('Send Verification Code'),
               onPressed: () async {
                 final currentUser = FirebaseAuth.instance.currentUser;
+                print(currentUser);
                 currentUser?.sendEmailVerification();
               },
             ),

@@ -1,5 +1,6 @@
 import 'package:catalog_app_tut/views/email_verification_view.dart';
 import 'package:catalog_app_tut/views/login_view.dart';
+import 'package:catalog_app_tut/views/main_notes_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -16,29 +17,16 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        if (snapshot.data?.emailVerified ?? false) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Logged In'),
-            ),
-            body: Column(
-              children: [
-                Center(child: Text('Logged in as ${snapshot.data?.email}')),
-                TextButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                    },
-                    child: const Text('Logout'))
-              ],
-            ),
-          );
+        if (snapshot.hasData) {
+          if (snapshot.data?.emailVerified ?? false) {
+            return MainNotesView(
+              email: snapshot.data?.email,
+            );
+          } else {
+            return const EmailVerificationView();
+          }
         } else {
-          return EmailVerificationView();
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => const EmailVerificationView(),
-          //     ));
+          return const LoginView();
         }
       },
     );
