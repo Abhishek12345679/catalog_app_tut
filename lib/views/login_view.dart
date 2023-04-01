@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:catalog_app_tut/utilities/show_error_dialog.dart';
+import 'package:catalog_app_tut/views/main_notes_view.dart';
 import 'package:catalog_app_tut/views/register_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +69,16 @@ class _LoginViewState extends State<LoginView> {
                       email: _email.text,
                       password: _password.text,
                     );
+                    if (context.mounted) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MainNotesView(email: _email.text),
+                        ),
+                        (route) => false,
+                      );
+                    }
                     log(userCredential.toString());
                   } on FirebaseAuthException catch (e) {
                     await showErrorDialog(context, e.message!);
@@ -95,29 +107,4 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
-}
-
-Future<void> showErrorDialog(BuildContext context, String text) {
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Login Error'),
-        content: Text(text),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Dismiss',
-              style: TextStyle(
-                color: Colors.red,
-              ),
-            ),
-          )
-        ],
-      );
-    },
-  );
 }

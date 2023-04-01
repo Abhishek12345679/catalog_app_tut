@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:catalog_app_tut/views/email_verification_view.dart';
 import 'package:catalog_app_tut/views/login_view.dart';
 import 'package:catalog_app_tut/views/main_notes_view.dart';
@@ -26,6 +28,7 @@ class _HomePageState extends State<HomePage> {
             return const EmailVerificationView();
           }
         } else {
+          log('No Data');
           return const LoginView();
         }
       },

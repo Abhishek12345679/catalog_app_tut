@@ -1,4 +1,4 @@
-import 'package:catalog_app_tut/views/login_view.dart';
+import 'package:catalog_app_tut/views/register_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,10 @@ class EmailVerificationView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Enter the Verification Code to continue.',
+              'We have sent you a verification email. Please click on the link in the email to verify yourself.',
+            ),
+            const Text(
+              'If you have not recieved the verification email, please press the button below.',
             ),
             TextButton(
               child: const Text('Send Verification Code'),
@@ -27,6 +30,18 @@ class EmailVerificationView extends StatelessWidget {
                 final currentUser = FirebaseAuth.instance.currentUser;
                 // print(currentUser);
                 currentUser?.sendEmailVerification();
+              },
+            ),
+            TextButton(
+              child: const Text('Restart'),
+              onPressed: () async {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RegisterView(),
+                  ),
+                  (route) => false,
+                );
               },
             ),
           ],

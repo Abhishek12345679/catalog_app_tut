@@ -1,3 +1,4 @@
+import 'package:catalog_app_tut/utilities/show_error_dialog.dart';
 import 'package:catalog_app_tut/views/email_verification_view.dart';
 import 'package:catalog_app_tut/views/login_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -69,6 +70,8 @@ class _RegisterViewState extends State<RegisterView> {
                         email: _email.text,
                         password: _password.text,
                       );
+                      FirebaseAuth.instance.currentUser
+                          ?.sendEmailVerification();
                       if (kDebugMode) {
                         print('user: $userCredential');
                       }
@@ -82,9 +85,9 @@ class _RegisterViewState extends State<RegisterView> {
                         );
                       }
                     } on FirebaseAuthException catch (e) {
-                      if (kDebugMode) {
-                        print(e.code);
-                      }
+                      showErrorDialog(context, e.message!);
+                    } catch (err) {
+                      showErrorDialog(context, err.toString());
                     }
                   },
                   style: ButtonStyle(
