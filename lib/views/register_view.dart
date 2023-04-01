@@ -85,9 +85,19 @@ class _RegisterViewState extends State<RegisterView> {
                         );
                       }
                     } on FirebaseAuthException catch (e) {
-                      showErrorDialog(context, e.message!);
-                    } catch (err) {
-                      showErrorDialog(context, err.toString());
+                      if (e.code == 'email-already-in-use') {
+                        await showErrorDialog(
+                            context, "User with this email already exists");
+                      } else if (e.code == 'invalid-email') {
+                        await showErrorDialog(context, "Invalid Email Address");
+                      } else if (e.code == 'weak-password') {
+                        await showErrorDialog(
+                            context, "Please enter a stronger password");
+                      } else {
+                        await showErrorDialog(context, e.message!);
+                      }
+                    } catch (e) {
+                      await showErrorDialog(context, e.toString());
                     }
                   },
                   style: ButtonStyle(
