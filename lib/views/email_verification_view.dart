@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class EmailVerificationView extends StatelessWidget {
-  const EmailVerificationView({super.key});
+  const EmailVerificationView({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +21,11 @@ class EmailVerificationView extends StatelessWidget {
             const Text(
               'Enter the Verification Code to continue.',
             ),
-            // TextField(
-            //   decoration: InputDecoration(hintText: 'Verification Code'),
-            // ),
             TextButton(
               child: const Text('Send Verification Code'),
               onPressed: () async {
                 final currentUser = FirebaseAuth.instance.currentUser;
-                print(currentUser);
+                // print(currentUser);
                 currentUser?.sendEmailVerification();
               },
             ),

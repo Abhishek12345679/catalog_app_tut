@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:catalog_app_tut/views/register_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,13 +15,10 @@ class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
 
-  late String? loginValidationMessage;
-
   @override
   void initState() {
     _email = TextEditingController();
     _password = TextEditingController();
-    loginValidationMessage = null;
     super.initState();
   }
 
@@ -60,15 +59,6 @@ class _LoginViewState extends State<LoginView> {
                 autocorrect: false,
                 enableSuggestions: false,
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Text(
-                  loginValidationMessage ?? "",
-                  style: const TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
               TextButton(
                 onPressed: () async {
                   try {
@@ -77,15 +67,11 @@ class _LoginViewState extends State<LoginView> {
                       email: _email.text,
                       password: _password.text,
                     );
-                    setState(() {
-                      loginValidationMessage = '';
-                    });
-                    // print('user: $userCredential');
+                    log(userCredential.toString());
                   } on FirebaseAuthException catch (e) {
-                    // print('error: ${e.code}');
-                    setState(() {
-                      loginValidationMessage = e.message;
-                    });
+                    await showErrorDialog(context, e.message!);
+                  } catch (e) {
+                    showErrorDialog(context, e.toString());
                   }
                 },
                 child: const Text('Login'),
@@ -109,4 +95,29 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
+}
+
+Future<void> showErrorDialog(BuildContext context, String text) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Login Error'),
+        content: Text(text),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text(
+              'Dismiss',
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+          )
+        ],
+      );
+    },
+  );
 }
