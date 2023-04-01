@@ -1,9 +1,8 @@
 import 'dart:developer' show log;
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:catalog_app_tut/enums/popup_list_option.dart';
+import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
-
-enum PopupListOption { logout }
 
 class MainNotesView extends StatefulWidget {
   final String? email;
@@ -63,7 +62,7 @@ class _MainNotesViewState extends State<MainNotesView> {
             IconButton(
               onPressed: () async {
                 Navigator.pop(context);
-                await FirebaseAuth.instance.signOut();
+                await AuthService.firebase().logOut();
                 log('User with email ${widget.email} logged out!');
               },
               icon: const Text('Yes'),

@@ -1,8 +1,8 @@
+import 'package:catalog_app_tut/services/auth/auth_exceptions.dart';
+import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:catalog_app_tut/utilities/show_error_dialog.dart';
 import 'package:catalog_app_tut/views/email_verification_view.dart';
 import 'package:catalog_app_tut/views/login_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class RegisterView extends StatefulWidget {
@@ -65,16 +65,13 @@ class _RegisterViewState extends State<RegisterView> {
                 child: TextButton(
                   onPressed: () async {
                     try {
-                      final userCredential = await FirebaseAuth.instance
-                          .createUserWithEmailAndPassword(
+                      final userCredential =
+                          await AuthService.firebase().createUser(
                         email: _email.text,
                         password: _password.text,
                       );
-                      FirebaseAuth.instance.currentUser
-                          ?.sendEmailVerification();
-                      if (kDebugMode) {
-                        print('user: $userCredential');
-                      }
+                      await AuthService.firebase().sendVerificationEmail();
+
                       if (context.mounted) {
                         // The If block solves this:  Don't use 'BuildContext's across async gaps. Try rewriting the code to not reference the 'BuildContext'.
                         Navigator.push(
@@ -84,20 +81,26 @@ class _RegisterViewState extends State<RegisterView> {
                           ),
                         );
                       }
-                    } on FirebaseAuthException catch (e) {
-                      if (e.code == 'email-already-in-use') {
-                        await showErrorDialog(
-                            context, "User with this email already exists");
-                      } else if (e.code == 'invalid-email') {
-                        await showErrorDialog(context, "Invalid Email Address");
-                      } else if (e.code == 'weak-password') {
-                        await showErrorDialog(
-                            context, "Please enter a stronger password");
-                      } else {
-                        await showErrorDialog(context, e.message!);
-                      }
-                    } catch (e) {
-                      await showErrorDialog(context, e.toString());
+                    } on EmailAlreadyInUseAuthException {
+                      await showErrorDialog(
+                        context,
+                        "User with this email already exists",
+                      );
+                    } on InvalidEmailAuthException {
+                      await showErrorDialog(
+                        context,
+                        "Enter a valid Email Address",
+                      );
+                    } on WeakPasswordAuthException {
+                      await showErrorDialog(
+                        context,
+                        "Please enter a stronger password",
+                      );
+                    } on GenericAuthException catch (e) {
+                      await showErrorDialog(
+                        context,
+                        e.toString(),
+                      );
                     }
                   },
                   style: ButtonStyle(

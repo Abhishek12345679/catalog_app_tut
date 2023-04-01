@@ -1,11 +1,10 @@
-import 'package:catalog_app_tut/firebase_options.dart';
 import 'package:catalog_app_tut/pages/home_page.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await AuthService.firebase().initialize();
   runApp(const MyApp());
 }
 

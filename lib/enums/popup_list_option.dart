@@ -1,0 +1,1 @@
+enum PopupListOption { logout }
