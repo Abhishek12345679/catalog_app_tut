@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:developer' show log;
 
 import 'package:catalog_app_tut/views/email_verification_view.dart';
 import 'package:catalog_app_tut/views/login_view.dart';
