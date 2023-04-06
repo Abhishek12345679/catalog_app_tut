@@ -23,8 +23,58 @@ class NoteDoesNotExist implements Exception {}
 
 class CouldNotDeleteNote implements Exception {}
 
+class CouldNotFindNote implements Exception {}
+
+class CouldNotUpdateNote implements Exception {}
+
 class NotesService {
   Database? _db;
+
+  Future<DatabaseNote> updateNote({
+    required DatabaseNote databaseNote,
+    required String newText,
+  }) async {
+    final db = _getDatabaseOrThrow();
+
+    await getNote(noteId: databaseNote.id);
+
+    final updatesCount = await db.update(noteTable, {textColumn: newText});
+
+    if (updatesCount == 0) {
+      throw CouldNotUpdateNote();
+    }
+    return await getNote(noteId: databaseNote.id);
+  }
+
+  Future<List<DatabaseNote>> getAllNotes() async {
+    final db = _getDatabaseOrThrow();
+
+    final notes = await db.query(noteTable);
+
+    return notes.map((e) => DatabaseNote.fromRow(e)).toList();
+  }
+
+  Future<DatabaseNote> getNote({required int noteId}) async {
+    final db = _getDatabaseOrThrow();
+    final notes = await db.query(
+      noteTable,
+      limit: 1,
+      where: 'id = ?',
+      whereArgs: [noteId],
+    );
+
+    if (notes.isEmpty) {
+      throw CouldNotFindNote();
+    }
+
+    // users.first is same as users[0], only difference being, in how they deal with errors
+    return DatabaseNote.fromRow(notes.first);
+  }
+
+  Future<int> deleteAllNotes() async {
+    final db = _getDatabaseOrThrow();
+    return await db.delete(noteTable);
+  }
 
   Future<void> deleteNote({required int noteId}) async {
     final db = _getDatabaseOrThrow();
