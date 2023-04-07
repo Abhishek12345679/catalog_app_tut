@@ -11,12 +11,17 @@ import 'package:sqflite/sqflite.dart';
 class NotesService {
   Database? _db;
   List<DatabaseNote> _dbNotes = [];
-  final _dbNotesStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _dbNotesStreamController;
 
   // start: pattern for using a singleton in dart
   static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance();
+  NotesService._sharedInstance() {
+    _dbNotesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _dbNotesStreamController.sink.add(_dbNotes);
+      },
+    );
+  }
   factory NotesService() => _shared;
   // end: pattern for using a singleton in dart
 
@@ -212,6 +217,8 @@ class NotesService {
       return newUser;
     } catch (e) {
       // throws the exception raised by any remaining errors from getUser/create user have to be handled where `getOrCreateUser` is called.
+
+      // log(e.toString());
       rethrow;
     }
   }
@@ -334,10 +341,10 @@ class DatabaseNote {
 // constants
 const dbName = "notes.db";
 const noteTable = "note";
-const userTable = "table";
+const userTable = "user";
 const idColumn = 'id';
 const userIdColumn = 'user_id';
-const emailColumn = ' email';
+const emailColumn = 'email';
 const isSyncedToCloudColumn = 'is_synced_to_cloud';
 const textColumn = 'text';
 
@@ -345,7 +352,7 @@ const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
         "id"	INTEGER NOT NULL,
         "text"	TEXT,
         "user_id"	INTEGER NOT NULL,
-        "is_synced_with_cloud"	INTEGER NOT NULL DEFAULT 0,
+        "is_synced_to_cloud"	INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY("id" AUTOINCREMENT),
         FOREIGN KEY("user_id") REFERENCES "user"("id")
       );''';

@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
             return const EmailVerificationView();
           }
         } else {
-          log('No Data');
           return const LoginView();
         }
       },
