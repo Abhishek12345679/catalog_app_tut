@@ -21,9 +21,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data?.emailVerified ?? false) {
-            return MainNotesView(
-              email: snapshot.data?.email,
-            );
+            return const MainNotesView();
           } else {
             return const EmailVerificationView();
           }

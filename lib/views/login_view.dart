@@ -73,8 +73,7 @@ class _LoginViewState extends State<LoginView> {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              MainNotesView(email: _email.text),
+                          builder: (context) => const MainNotesView(),
                         ),
                         (route) => false,
                       );

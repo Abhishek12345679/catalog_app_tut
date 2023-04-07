@@ -2,19 +2,35 @@ import 'dart:developer' show log;
 
 import 'package:catalog_app_tut/enums/popup_list_option.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
+import 'package:catalog_app_tut/services/crud/notes_service.dart';
 import 'package:flutter/material.dart';
 
 class MainNotesView extends StatefulWidget {
-  final String? email;
-
-  const MainNotesView({super.key, required this.email});
+  const MainNotesView({super.key});
 
   @override
   State<MainNotesView> createState() => _MainNotesViewState();
 }
 
 class _MainNotesViewState extends State<MainNotesView> {
+  late final NotesService _notesService;
   PopupListOption? selectedMenu;
+
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+  // lifecycle events
+  @override
+  void initState() {
+    _notesService = NotesService();
+    _notesService.open();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notesService.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +61,7 @@ class _MainNotesViewState extends State<MainNotesView> {
       ),
       body: Column(
         children: [
-          Center(child: Text('Logged in as ${widget.email}')),
+          Center(child: Text('Logged in as $userEmail')),
         ],
       ),
     );
@@ -63,7 +79,7 @@ class _MainNotesViewState extends State<MainNotesView> {
               onPressed: () async {
                 Navigator.pop(context);
                 await AuthService.firebase().logOut();
-                log('User with email ${widget.email} logged out!');
+                log('User with email $userEmail logged out!');
               },
               icon: const Text('Yes'),
             ),
