@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:catalog_app_tut/services/auth/auth_exceptions.dart';
 import 'package:catalog_app_tut/services/crud/crud_exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' show join;
@@ -181,6 +182,19 @@ class NotesService {
     );
 
     return DatabaseUser(id: userId, email: email);
+  }
+
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUser catch (_) {
+      final newUser = await createUser(email: email);
+      return newUser;
+    } catch (e) {
+      // throws the exception raised by any remaining errors from getUser/create user have to be handled where `getOrCreateUser` is called.
+      rethrow;
+    }
   }
 
   Future<void> deleteUser({required String email}) async {
