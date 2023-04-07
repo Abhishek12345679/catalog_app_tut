@@ -77,8 +77,6 @@ class _MainNotesViewState extends State<MainNotesView> {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
                         final allNotes = snapshot.data as List<DatabaseNote>;
-                        // print(notes);
-                        // return const Text("Notes will appear here");
                         return ListView.builder(
                           itemCount: snapshot.data?.length,
                           itemBuilder: (context, index) {
