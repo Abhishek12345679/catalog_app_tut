@@ -3,7 +3,8 @@ import 'dart:developer' show log;
 import 'package:catalog_app_tut/services/auth/auth_exceptions.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:catalog_app_tut/utilities/show_error_dialog.dart';
-import 'package:catalog_app_tut/views/main_notes_view.dart';
+import 'package:catalog_app_tut/views/notes/main_notes_view.dart';
+
 import 'package:catalog_app_tut/views/register_view.dart';
 import 'package:flutter/material.dart';
 
@@ -73,8 +74,7 @@ class _LoginViewState extends State<LoginView> {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const MainNotesView(),
-                        ),
+                            builder: (context) => const MainNotesView()),
                         (route) => false,
                       );
                     }

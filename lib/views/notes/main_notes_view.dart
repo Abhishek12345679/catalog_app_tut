@@ -3,6 +3,7 @@ import 'dart:developer' show log;
 import 'package:catalog_app_tut/enums/popup_list_option.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:catalog_app_tut/services/crud/notes_service.dart';
+import 'package:catalog_app_tut/views/notes/new_note_view.dart';
 import 'package:flutter/material.dart';
 
 class MainNotesView extends StatefulWidget {
@@ -37,6 +38,17 @@ class _MainNotesViewState extends State<MainNotesView> {
       appBar: AppBar(
         title: const Text('Your Notes'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NewNoteView(),
+                ),
+              );
+            },
+          ),
           PopupMenuButton<PopupListOption>(
             initialValue: selectedMenu,
             onSelected: (item) async {
@@ -55,7 +67,7 @@ class _MainNotesViewState extends State<MainNotesView> {
                 child: Text("Logout"),
               ),
             ],
-          )
+          ),
         ],
       ),
       body: FutureBuilder(
@@ -68,7 +80,8 @@ class _MainNotesViewState extends State<MainNotesView> {
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      return const Text("waiting for notes ");
+                    case ConnectionState.active:
+                      return const Text("waiting for notes");
                     default:
                       return const CircularProgressIndicator();
                   }
