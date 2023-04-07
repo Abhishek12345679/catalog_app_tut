@@ -14,6 +14,14 @@ class NotesService {
   final _dbNotesStreamController =
       StreamController<List<DatabaseNote>>.broadcast();
 
+  // start: pattern for using a singleton in dart
+  static final NotesService _shared = NotesService._sharedInstance();
+  NotesService._sharedInstance();
+  factory NotesService() => _shared;
+  // end: pattern for using a singleton in dart
+
+  Stream<List<DatabaseNote>> get allNotes => _dbNotesStreamController.stream;
+
   Future<void> _cacheNotes() async {
     final notes = await getAllNotes();
     _dbNotes = notes;

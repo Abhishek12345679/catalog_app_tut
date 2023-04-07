@@ -22,7 +22,6 @@ class _MainNotesViewState extends State<MainNotesView> {
   @override
   void initState() {
     _notesService = NotesService();
-    _notesService.open();
     super.initState();
   }
 
@@ -59,10 +58,26 @@ class _MainNotesViewState extends State<MainNotesView> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          Center(child: Text('Logged in as $userEmail')),
-        ],
+      body: FutureBuilder(
+        future: _notesService.getOrCreateUser(email: userEmail),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _notesService.allNotes,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return const Text("waiting for notes ");
+                    default:
+                      return const CircularProgressIndicator();
+                  }
+                },
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
+        },
       ),
     );
   }
