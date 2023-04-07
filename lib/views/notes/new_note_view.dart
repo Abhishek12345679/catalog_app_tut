@@ -12,7 +12,7 @@ class NewNoteView extends StatefulWidget {
 class _NewNoteViewState extends State<NewNoteView> {
   DatabaseNote? _note;
   late final NotesService _notesService;
-  late final TextEditingController _newNote;
+  late final TextEditingController _newNoteTEController;
 
   Future<DatabaseNote> createNewNote() async {
     final existingNote = _note;
@@ -24,14 +24,53 @@ class _NewNoteViewState extends State<NewNoteView> {
     return await _notesService.createNote(owner: owner);
   }
 
+  void _setupTextControllerListener() {
+    _newNoteTEController.removeListener(_textControllerListener);
+    _newNoteTEController.addListener(_textControllerListener);
+  }
+
+  void _textControllerListener() async {
+    final note = _note;
+    if (note == null) {
+      return;
+    }
+    final text = _newNoteTEController.text;
+    await _notesService.updateNote(
+      databaseNote: note,
+      newText: text,
+    );
+  }
+
+  void _deleteNoteIfEmpty() {
+    final note = _note;
+    if (_newNoteTEController.text.isEmpty && note != null) {
+      _notesService.deleteNote(noteId: note.id);
+    }
+  }
+
+  void _saveNoteIfNotEmpty() async {
+    final note = _note;
+    final newText = _newNoteTEController.text;
+    if (newText.isNotEmpty && note != null) {
+      await _notesService.updateNote(
+        databaseNote: note,
+        newText: newText,
+      );
+    }
+  }
+
   @override
   void initState() {
-    _newNote = TextEditingController();
+    _notesService = NotesService();
+    _newNoteTEController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
+    _deleteNoteIfEmpty();
+    _saveNoteIfNotEmpty();
+    _newNoteTEController.dispose();
     super.dispose();
   }
 
@@ -44,22 +83,26 @@ class _NewNoteViewState extends State<NewNoteView> {
       body: FutureBuilder(
         future: createNewNote(),
         builder: (context, snapshot) {
-          return Column(
-            children: [
-              Padding(
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              _note = snapshot.data;
+              _setupTextControllerListener();
+
+              return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   decoration: const InputDecoration(
                     hintText: 'Enter the new note here ...',
                   ),
-                  minLines: 2,
-                  maxLines: 4,
+                  keyboardType: TextInputType.multiline,
                   autofocus: true,
-                  controller: _newNote,
+                  controller: _newNoteTEController,
+                  maxLines: null,
                 ),
-              )
-            ],
-          );
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
         },
       ),
     );
