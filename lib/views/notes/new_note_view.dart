@@ -35,6 +35,7 @@ class _NewNoteViewState extends State<NewNoteView> {
       return;
     }
     final text = _newNoteTEController.text;
+
     await _notesService.updateNote(
       databaseNote: note,
       newText: text,
