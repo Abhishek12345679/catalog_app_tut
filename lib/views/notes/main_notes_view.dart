@@ -3,6 +3,7 @@ import 'dart:developer' show log;
 import 'package:catalog_app_tut/enums/popup_list_option.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:catalog_app_tut/services/crud/notes_service.dart';
+import 'package:catalog_app_tut/utilities/dialog/logout_dialog.dart';
 import 'package:catalog_app_tut/views/notes/new_note_view.dart';
 import 'package:catalog_app_tut/views/notes/notes_list_view.dart';
 import 'package:flutter/material.dart';
@@ -89,7 +90,11 @@ class _MainNotesViewState extends State<MainNotesView> {
                         final allNotes = snapshot.data as List<DatabaseNote>;
                         return NotesListView(
                           notesList: allNotes,
-                          onDeleteNote: (DatabaseNote note) {},
+                          onDeleteNote: (note) async {
+                            await _notesService.deleteNote(
+                              noteId: note.id,
+                            );
+                          },
                         );
                       } else {
                         return const CircularProgressIndicator();
@@ -105,31 +110,5 @@ class _MainNotesViewState extends State<MainNotesView> {
         },
       ),
     );
-  }
-
-  Future<bool> showLogoutDialog(BuildContext context) {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure? You want to log out.'),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context, false);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              child: const Text('Log out'),
-            ),
-          ],
-        );
-      },
-    ).then((value) => value ?? false);
   }
 }

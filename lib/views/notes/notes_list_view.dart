@@ -1,6 +1,6 @@
 import 'package:catalog_app_tut/services/crud/notes_service.dart';
+import 'package:catalog_app_tut/utilities/dialog/delete_note_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 
 typedef DeleteNoteCallback = void Function(DatabaseNote note);
 
@@ -16,6 +16,9 @@ class NotesListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (notesList.isEmpty) {
+      return const Center(child: Text("Nothing to see here :>"));
+    }
     return ListView.builder(
       itemCount: notesList.length,
       itemBuilder: (context, index) {
@@ -35,7 +38,7 @@ class NotesListView extends StatelessWidget {
             onPressed: () async {
               final shouldDelete = await showDeleteNoteDialog(context);
               if (shouldDelete) {
-                // onDeleteNote(currentNote);
+                onDeleteNote(currentNote);
               }
             },
           ),
@@ -44,5 +47,3 @@ class NotesListView extends StatelessWidget {
     );
   }
 }
-
-showDeleteNoteDialog(BuildContext context) {}
