@@ -48,7 +48,17 @@ class _MainNotesViewState extends State<MainNotesView> {
             onSelected: (item) async {
               switch (item) {
                 case PopupListOption.logout:
-                  await showLogoutDialog(context);
+                  try {
+                    final shouldLogout = await showLogoutDialog(context);
+                    if (shouldLogout) {
+                      await AuthService.firebase().logOut();
+                      log('User with email $userEmail logged out!');
+                    } else {
+                      log('logout cancelled XX');
+                    }
+                  } catch (e) {
+                    log('error: $e');
+                  }
                   break;
               }
               setState(() {
@@ -115,19 +125,17 @@ class _MainNotesViewState extends State<MainNotesView> {
           title: const Text('Logout'),
           content: const Text('Are you sure? You want to log out.'),
           actions: [
-            IconButton(
+            TextButton(
               onPressed: () async {
-                Navigator.pop(context);
-                await AuthService.firebase().logOut();
-                log('User with email $userEmail logged out!');
+                Navigator.pop(context, false);
               },
-              icon: const Text('Yes'),
+              child: const Text('Cancel'),
             ),
-            IconButton(
+            TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               },
-              icon: const Text('No'),
+              child: const Text('Log out'),
             ),
           ],
         );
