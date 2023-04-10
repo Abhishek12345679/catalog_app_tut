@@ -1,6 +1,6 @@
 import 'package:catalog_app_tut/services/auth/auth_exceptions.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
-import 'package:catalog_app_tut/utilities/show_error_dialog.dart';
+import 'package:catalog_app_tut/utilities/dialog/error_dialog.dart';
 import 'package:catalog_app_tut/views/email_verification_view.dart';
 import 'package:catalog_app_tut/views/login_view.dart';
 import 'package:flutter/material.dart';

@@ -4,6 +4,7 @@ import 'package:catalog_app_tut/enums/popup_list_option.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:catalog_app_tut/services/crud/notes_service.dart';
 import 'package:catalog_app_tut/views/notes/new_note_view.dart';
+import 'package:catalog_app_tut/views/notes/notes_list_view.dart';
 import 'package:flutter/material.dart';
 
 class MainNotesView extends StatefulWidget {
@@ -53,9 +54,8 @@ class _MainNotesViewState extends State<MainNotesView> {
                     if (shouldLogout) {
                       await AuthService.firebase().logOut();
                       log('User with email $userEmail logged out!');
-                    } else {
-                      log('logout cancelled XX');
                     }
+                    log('logout cancelled XX');
                   } catch (e) {
                     log('error: $e');
                   }
@@ -87,19 +87,9 @@ class _MainNotesViewState extends State<MainNotesView> {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
                         final allNotes = snapshot.data as List<DatabaseNote>;
-                        return ListView.builder(
-                          itemCount: snapshot.data?.length,
-                          itemBuilder: (context, index) {
-                            final currentNote = allNotes[index];
-                            return ListTile(
-                              title: Text(
-                                currentNote.text,
-                                maxLines: 1,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          },
+                        return NotesListView(
+                          notesList: allNotes,
+                          onDeleteNote: (DatabaseNote note) {},
                         );
                       } else {
                         return const CircularProgressIndicator();
