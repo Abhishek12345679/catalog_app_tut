@@ -4,7 +4,7 @@ import 'package:catalog_app_tut/enums/popup_list_option.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:catalog_app_tut/services/crud/notes_service.dart';
 import 'package:catalog_app_tut/utilities/dialog/logout_dialog.dart';
-import 'package:catalog_app_tut/views/notes/new_note_view.dart';
+import 'package:catalog_app_tut/views/notes/create_update_note_view.dart';
 import 'package:catalog_app_tut/views/notes/notes_list_view.dart';
 import 'package:flutter/material.dart';
 
@@ -40,7 +40,7 @@ class _MainNotesViewState extends State<MainNotesView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const NewNoteView(),
+                  builder: (context) => const CreateUpdateNoteView(),
                 ),
               );
             },
@@ -93,6 +93,17 @@ class _MainNotesViewState extends State<MainNotesView> {
                           onDeleteNote: (note) async {
                             await _notesService.deleteNote(
                               noteId: note.id,
+                            );
+                          },
+                          onTapNote: (note) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const CreateUpdateNoteView(),
+                                settings: RouteSettings(
+                                  arguments: note,
+                                ),
+                              ),
                             );
                           },
                         );
