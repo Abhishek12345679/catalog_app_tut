@@ -15,6 +15,11 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   late final NotesService _notesService;
   late final TextEditingController _newNoteTEController;
 
+  bool isNewNote(BuildContext context) {
+    final widgetNote = context.getArguments<DatabaseNote>();
+    return widgetNote != null ? false : true;
+  }
+
   Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
     final widgetNote = context.getArguments<DatabaseNote>();
 
@@ -91,7 +96,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Note'),
+        title:
+            Text(isNewNote(context) ? 'Add New Note' : 'Update Existing Note'),
       ),
       body: FutureBuilder(
         future: createOrGetExistingNote(context),

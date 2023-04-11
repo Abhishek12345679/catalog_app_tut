@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:catalog_app_tut/services/crud/crud_exceptions.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,7 @@ import 'package:sqflite/sqflite.dart';
 
 class NotesService {
   Database? _db;
+  DatabaseUser? _user;
   List<DatabaseNote> _dbNotes = [];
   late final StreamController<List<DatabaseNote>> _dbNotesStreamController;
 
@@ -67,6 +69,7 @@ class NotesService {
   Future<List<DatabaseNote>> getAllNotes() async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
+
     final allNotes = await db.query(noteTable);
     final dbNotes = allNotes.map((e) => DatabaseNote.fromRow(e)).toList();
 
@@ -187,10 +190,6 @@ class NotesService {
       throw CouldNotFindUser();
     }
 
-    // if (users.length > 1) {
-    // throw MoreThanOneUserFoundWithTheSameEmail();
-    // }
-
     // users.first is same as users[0], only difference being, in how they deal with errors
     return DatabaseUser.fromRow(users.first);
   }
@@ -215,17 +214,25 @@ class NotesService {
     return DatabaseUser(id: userId, email: email);
   }
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     try {
       final user = await getUser(email: email);
+      if (setAsCurrentUser) {
+        _user = user;
+      }
+      log(_user.toString());
       return user;
     } on CouldNotFindUser catch (_) {
       final newUser = await createUser(email: email);
+      if (setAsCurrentUser) {
+        _user = newUser;
+      }
       return newUser;
-    } catch (e) {
+    } catch (_) {
       // throws the exception raised by any remaining errors from getUser/create user have to be handled where `getOrCreateUser` is called.
-
-      // log(e.toString());
       rethrow;
     }
   }
@@ -304,7 +311,7 @@ class DatabaseUser {
         email = map[emailColumn] as String;
 
   @override
-  String toString() => 'Person, ID = $id, email = $email';
+  String toString() => 'DatabaseUser, ID = $id, email = $email';
 
   @override
   bool operator ==(covariant DatabaseUser other) => id == other.id;
