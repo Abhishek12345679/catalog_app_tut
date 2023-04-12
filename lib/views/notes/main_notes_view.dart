@@ -4,6 +4,7 @@ import 'package:catalog_app_tut/enums/popup_list_option.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:catalog_app_tut/services/crud/notes_service.dart';
 import 'package:catalog_app_tut/utilities/dialog/logout_dialog.dart';
+import 'package:catalog_app_tut/views/login_view.dart';
 import 'package:catalog_app_tut/views/notes/create_update_note_view.dart';
 import 'package:catalog_app_tut/views/notes/notes_list_view.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +55,15 @@ class _MainNotesViewState extends State<MainNotesView> {
                     final shouldLogout = await showLogoutDialog(context);
                     if (shouldLogout) {
                       await AuthService.firebase().logOut();
+                      if (context.mounted) {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginView(),
+                          ),
+                          (route) => false,
+                        );
+                      }
                       log('User with email $userEmail logged out!');
                     }
                     log('logout cancelled XX');

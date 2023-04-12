@@ -1,8 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'dart:async';
-import 'dart:developer';
 
+import 'package:catalog_app_tut/extensions/list/filter.dart';
 import 'package:catalog_app_tut/services/crud/crud_exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' show join;
@@ -12,6 +12,7 @@ import 'package:sqflite/sqflite.dart';
 class NotesService {
   Database? _db;
   DatabaseUser? _user;
+
   List<DatabaseNote> _dbNotes = [];
   late final StreamController<List<DatabaseNote>> _dbNotesStreamController;
 
@@ -27,7 +28,16 @@ class NotesService {
   factory NotesService() => _shared;
   // end: pattern for using a singleton in dart
 
-  Stream<List<DatabaseNote>> get allNotes => _dbNotesStreamController.stream;
+  Stream<List<DatabaseNote>> get allNotes {
+    return _dbNotesStreamController.stream.filter((note) {
+      final currentUser = _user;
+      if (currentUser != null) {
+        return note.userId == currentUser.id;
+      } else {
+        throw UserShouldBeSetBeforeReadingAllNotes();
+      }
+    });
+  }
 
   Future<void> _cacheNotes() async {
     final notes = await getAllNotes();
@@ -47,9 +57,7 @@ class NotesService {
 
     final updatesCount = await db.update(
       noteTable,
-      {
-        textColumn: newText,
-      },
+      {textColumn: newText},
       where: 'id = ?',
       whereArgs: [databaseNote.id],
     );
@@ -223,7 +231,6 @@ class NotesService {
       if (setAsCurrentUser) {
         _user = user;
       }
-      log(_user.toString());
       return user;
     } on CouldNotFindUser catch (_) {
       final newUser = await createUser(email: email);
