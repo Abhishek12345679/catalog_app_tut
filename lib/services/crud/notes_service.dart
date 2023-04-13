@@ -9,6 +9,8 @@ import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'crud_constants.dart';
+
 class NotesService {
   Database? _db;
   DatabaseUser? _user;
@@ -340,6 +342,7 @@ class DatabaseNote {
     required this.isSyncedToCloud,
   });
 
+// for converting the JSON into DatabaseNote
   DatabaseNote.fromRow(Map<String, Object?> map)
       : id = map[idColumn] as int,
         userId = map[userIdColumn] as int,
@@ -347,7 +350,6 @@ class DatabaseNote {
             (map[isSyncedToCloudColumn] as int) == 1 ? true : false,
         text = map[textColumn] as String;
 
-  // functions that are needed to be overriden by default
   @override
   String toString() =>
       'Note,id: $id, userId:$userId, isSyncedToColumn:$isSyncedToCloud, note:$text';
@@ -358,28 +360,3 @@ class DatabaseNote {
   @override
   int get hashCode => id.hashCode;
 }
-
-// constants
-const dbName = "notes.db";
-const noteTable = "note";
-const userTable = "user";
-const idColumn = 'id';
-const userIdColumn = 'user_id';
-const emailColumn = 'email';
-const isSyncedToCloudColumn = 'is_synced_to_cloud';
-const textColumn = 'text';
-
-const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
-        "id"	INTEGER NOT NULL,
-        "text"	TEXT,
-        "user_id"	INTEGER NOT NULL,
-        "is_synced_to_cloud"	INTEGER NOT NULL DEFAULT 0,
-        PRIMARY KEY("id" AUTOINCREMENT),
-        FOREIGN KEY("user_id") REFERENCES "user"("id")
-      );''';
-
-const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
-        "id"	INTEGER NOT NULL UNIQUE,
-        "email"	TEXT NOT NULL UNIQUE,
-        PRIMARY KEY("id" AUTOINCREMENT)
-      );''';
