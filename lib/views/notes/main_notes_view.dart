@@ -20,7 +20,7 @@ class _MainNotesViewState extends State<MainNotesView> {
   late final NotesService _notesService;
   PopupListOption? selectedMenu;
 
-  String get userEmail => AuthService.firebase().currentUser!.email!;
+  String get userEmail => AuthService.firebase().currentUser!.email;
 
   // lifecycle events
   @override
