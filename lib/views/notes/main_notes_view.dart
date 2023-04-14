@@ -2,7 +2,9 @@ import 'dart:developer' show log;
 
 import 'package:catalog_app_tut/enums/popup_list_option.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
-import 'package:catalog_app_tut/services/crud/notes_service.dart';
+import 'package:catalog_app_tut/services/auth/auth_user.dart';
+import 'package:catalog_app_tut/services/cloud/cloud_note.dart';
+import 'package:catalog_app_tut/services/cloud/firestore_service.dart';
 import 'package:catalog_app_tut/utilities/dialog/logout_dialog.dart';
 import 'package:catalog_app_tut/views/login_view.dart';
 import 'package:catalog_app_tut/views/notes/create_update_note_view.dart';
@@ -17,15 +19,15 @@ class MainNotesView extends StatefulWidget {
 }
 
 class _MainNotesViewState extends State<MainNotesView> {
-  late final NotesService _notesService;
+  late final FirestoreService _notesService;
   PopupListOption? selectedMenu;
 
-  String get userEmail => AuthService.firebase().currentUser!.email;
+  AuthUser get currentUser => AuthService.firebase().currentUser!;
 
   // lifecycle events
   @override
   void initState() {
-    _notesService = NotesService();
+    _notesService = FirestoreService();
     super.initState();
   }
 
@@ -64,7 +66,7 @@ class _MainNotesViewState extends State<MainNotesView> {
                           (route) => false,
                         );
                       }
-                      log('User with email $userEmail logged out!');
+                      log('User with email ${currentUser.email} logged out!');
                     }
                     log('logout cancelled XX');
                   } catch (e) {
@@ -85,46 +87,33 @@ class _MainNotesViewState extends State<MainNotesView> {
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: _notesService.getOrCreateUser(email: userEmail),
+      body: StreamBuilder(
+        stream: _notesService.allNotes(ownerUserId: currentUser.id),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return StreamBuilder(
-                stream: _notesService.allNotes,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      if (snapshot.hasData) {
-                        final allNotes = snapshot.data as List<DatabaseNote>;
-                        return NotesListView(
-                          notesList: allNotes,
-                          onDeleteNote: (note) async {
-                            await _notesService.deleteNote(
-                              noteId: note.id,
-                            );
-                          },
-                          onTapNote: (note) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const CreateUpdateNoteView(),
-                                settings: RouteSettings(
-                                  arguments: note,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        return const CircularProgressIndicator();
-                      }
-                    default:
-                      return const CircularProgressIndicator();
-                  }
-                },
-              );
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              if (snapshot.hasData) {
+                final allNotes = snapshot.data as Iterable<CloudNote>;
+                return NotesListView(
+                  notes: allNotes,
+                  onDeleteNote: (note) async {
+                    await _notesService.deleteNote(documentId: note.id);
+                  },
+                  onTapNote: (note) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const CreateUpdateNoteView(),
+                        settings: RouteSettings(
+                          arguments: note,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              } else {
+                return const CircularProgressIndicator();
+              }
             default:
               return const CircularProgressIndicator();
           }

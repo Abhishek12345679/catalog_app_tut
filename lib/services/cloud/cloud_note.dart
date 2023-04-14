@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 @immutable
 class CloudNote {
-  final int ownerUserId;
+  final String ownerUserId;
   final String id;
   final String text;
 

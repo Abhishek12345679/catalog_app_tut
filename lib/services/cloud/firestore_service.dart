@@ -6,7 +6,38 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirestoreService {
   final notes = FirebaseFirestore.instance.collection('notes');
 
-  Future<Iterable<CloudNote>> getNotes({required int ownerUserId}) async {
+  Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) {
+    // notes.snapshots() is a stream of QuerySnapshot
+    return notes.snapshots().map((event) => event.docs.map((doc) {
+          final note = CloudNote.fromSnapshot(doc);
+          return note;
+        }).where((note) => note.ownerUserId == ownerUserId));
+  }
+
+  Future<void> updateNote({
+    required String documentId,
+    required String text,
+  }) async {
+    try {
+      await notes.doc(documentId).update({
+        textFieldName: text,
+      });
+    } catch (e) {
+      throw CouldNotUpdateNoteException();
+    }
+  }
+
+  Future<void> deleteNote({
+    required String documentId,
+  }) async {
+    try {
+      await notes.doc(documentId).delete();
+    } catch (e) {
+      throw CouldNotDeleteNoteException();
+    }
+  }
+
+  Future<Iterable<CloudNote>> getNotes({required String ownerUserId}) async {
     try {
       return await notes
           .where(
@@ -17,7 +48,9 @@ class FirestoreService {
           .then(
             (value) => value.docs.map(
               (doc) {
-                return CloudNote.fromSnapshot(doc);
+                return CloudNote.fromSnapshot(
+                  doc,
+                );
               },
             ),
           );
@@ -26,14 +59,20 @@ class FirestoreService {
     }
   }
 
-  void createNewNote({
-    required int ownerUserId,
+  Future<CloudNote> createNewNote({
+    required String ownerUserId,
     // required String text,
   }) async {
-    await notes.add({
+    final document = await notes.add({
       ownerUserIdFieldName: ownerUserId,
       textFieldName: "",
     });
+    final fetchedNote = await document.get();
+    return CloudNote(
+      ownerUserId: ownerUserId,
+      id: fetchedNote.id,
+      text: "",
+    );
   }
 
   // start: pattern for using a singleton in dart

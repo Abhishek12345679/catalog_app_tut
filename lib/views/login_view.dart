@@ -78,7 +78,6 @@ class _LoginViewState extends State<LoginView> {
                         (route) => false,
                       );
                     }
-                    log(userCredential.toString());
                   } on UserNotFoundAuthException {
                     await showErrorDialog(
                       context,

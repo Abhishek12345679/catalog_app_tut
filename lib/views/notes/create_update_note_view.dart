@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
-import 'package:catalog_app_tut/services/crud/notes_service.dart';
+import 'package:catalog_app_tut/services/cloud/cloud_note.dart';
+import 'package:catalog_app_tut/services/cloud/firestore_service.dart';
 import 'package:catalog_app_tut/utilities/generics/get_arguments.dart';
 import 'package:flutter/material.dart';
 
@@ -11,39 +14,15 @@ class CreateUpdateNoteView extends StatefulWidget {
 }
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
-  DatabaseNote? _note;
-  late final NotesService _notesService;
+  CloudNote? _note;
+  late final FirestoreService _notesService;
   late final TextEditingController _newNoteTEController;
 
-  bool isNewNote(BuildContext context) {
-    final widgetNote = context.getArguments<DatabaseNote>();
-    return widgetNote != null ? false : true;
-  }
-
-  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
-    final widgetNote = context.getArguments<DatabaseNote>();
-
-    if (widgetNote != null) {
-      _note = widgetNote;
-      _newNoteTEController.text = widgetNote.text;
-      return widgetNote;
-    }
-
-    final existingNote = _note;
-
-    if (existingNote != null) {
-      return existingNote;
-    }
-    final email = AuthService.firebase().currentUser!.email;
-    final owner = await _notesService.getUser(email: email);
-    final newNote = await _notesService.createNote(owner: owner);
-    _note = newNote;
-    return newNote;
-  }
-
-  void _setupTextControllerListener() {
-    _newNoteTEController.removeListener(_textControllerListener);
-    _newNoteTEController.addListener(_textControllerListener);
+  @override
+  void initState() {
+    _notesService = FirestoreService();
+    _newNoteTEController = TextEditingController();
+    super.initState();
   }
 
   void _textControllerListener() async {
@@ -54,15 +33,49 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final text = _newNoteTEController.text;
 
     await _notesService.updateNote(
-      databaseNote: note,
-      newText: text,
+      documentId: note.id,
+      text: text,
     );
+  }
+
+  bool isNewNote(BuildContext context) {
+    final widgetNote = context.getArguments<CloudNote>();
+    return widgetNote != null ? false : true;
+  }
+
+  Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
+    final widgetNote = context.getArguments<CloudNote>();
+
+    if (widgetNote != null) {
+      _note = widgetNote;
+      _newNoteTEController.text = widgetNote.text;
+      return widgetNote;
+    }
+
+    final existingNote = _note;
+    if (existingNote != null) {
+      return existingNote;
+    }
+
+    final currentUser = AuthService.firebase().currentUser!;
+    final userId = currentUser.id;
+    final newNote = await _notesService.createNewNote(
+      ownerUserId: userId,
+    );
+
+    _note = newNote;
+    return newNote;
+  }
+
+  void _setupTextControllerListener() {
+    _newNoteTEController.removeListener(_textControllerListener);
+    _newNoteTEController.addListener(_textControllerListener);
   }
 
   void _deleteNoteIfEmpty() {
     final note = _note;
     if (_newNoteTEController.text.isEmpty && note != null) {
-      _notesService.deleteNote(noteId: note.id);
+      _notesService.deleteNote(documentId: note.id);
     }
   }
 
@@ -71,17 +84,10 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final newText = _newNoteTEController.text;
     if (newText.isNotEmpty && note != null) {
       await _notesService.updateNote(
-        databaseNote: note,
-        newText: newText,
+        documentId: note.id,
+        text: newText,
       );
     }
-  }
-
-  @override
-  void initState() {
-    _notesService = NotesService();
-    _newNoteTEController = TextEditingController();
-    super.initState();
   }
 
   @override
@@ -118,7 +124,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                 ),
               );
             default:
-              return const CircularProgressIndicator();
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
           }
         },
       ),
