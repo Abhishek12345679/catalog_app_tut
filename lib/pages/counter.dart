@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Counter extends StatefulWidget {
   const Counter({super.key});
@@ -11,19 +11,93 @@ class Counter extends StatefulWidget {
 
 class _CounterState extends State<Counter> {
   @override
+  void initState() {
+    _controller = TextEditingController();
+    super.initState();
+  }
+
+  late final TextEditingController _controller;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bloc Counter'),
-      ),
-      body: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Center(child: Text('Counter')),
+    return BlocProvider(
+      create: (context) => CounterBloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Bloc Counter'),
+        ),
+        body: BlocConsumer<CounterBloc, CounterState>(
+          builder: (context, state) {
+            final invalidValue =
+                (state is CounterStateInvalid) ? state.invalidValue : '';
+
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    state.value.toString(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 40,
+                    ),
+                  ),
+                  Visibility(
+                    visible: state is CounterStateInvalid,
+                    child: const Text("Invalid Input"),
+                  ),
+                  TextField(
+                    controller: _controller,
+                    keyboardType: TextInputType.number,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          context.read<CounterBloc>().add(
+                                DecrementEvent(
+                                  value: _controller.text,
+                                ),
+                              );
+                        },
+                        icon: const Icon(
+                          Icons.remove,
+                          size: 40,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          context.read<CounterBloc>().add(
+                                IncrementEvent(
+                                  value: _controller.text,
+                                ),
+                              );
+                        },
+                        icon: const Icon(Icons.add),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            );
+          },
+          listener: (context, state) {
+            _controller.clear();
+          },
+        ),
       ),
     );
   }
 }
 
+// super state
 @immutable
 abstract class CounterState {
   final int value;
@@ -33,6 +107,7 @@ abstract class CounterState {
   );
 }
 
+//sub states
 class CounterStateValid extends CounterState {
   // here the value passed to CounterStateValid gets passed on to CounterState via the  'super()', the super key calls the superclass
   const CounterStateValid(int value) : super(value);
@@ -46,6 +121,7 @@ class CounterStateInvalid extends CounterState {
   }) : super(previousValue);
 }
 
+// super event
 @immutable
 abstract class CounterEvent {
   final String value;
@@ -54,6 +130,7 @@ abstract class CounterEvent {
   });
 }
 
+// events
 class IncrementEvent extends CounterEvent {
   const IncrementEvent({required super.value});
 }
@@ -66,6 +143,35 @@ class DecrementEvent extends CounterEvent {
 
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
   CounterBloc() : super(const CounterStateValid(0)) {
-    //
+    on<IncrementEvent>((event, emit) {
+      final value = int.tryParse(event.value);
+      if (value == null) {
+        emit(
+          CounterStateInvalid(
+            invalidValue: event.value,
+            previousValue: state.value,
+          ),
+        );
+      } else {
+        emit(
+          CounterStateValid(state.value + value),
+        );
+      }
+    });
+    on<DecrementEvent>((event, emit) {
+      final value = int.tryParse(event.value);
+      if (value == null) {
+        emit(
+          CounterStateInvalid(
+            invalidValue: event.value,
+            previousValue: state.value,
+          ),
+        );
+      } else {
+        emit(
+          CounterStateValid(state.value - value),
+        );
+      }
+    });
   }
 }
