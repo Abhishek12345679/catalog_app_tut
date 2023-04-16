@@ -121,6 +121,8 @@ class CounterStateInvalid extends CounterState {
   }) : super(previousValue);
 }
 
+// * abstract classes are like interfaces (however all classes can be used as interfaces, only thing that differentiates abstract classes from classes is that abstract classes cannot be instantiated)
+
 // super event
 @immutable
 abstract class CounterEvent {
@@ -143,35 +145,38 @@ class DecrementEvent extends CounterEvent {
 
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
   CounterBloc() : super(const CounterStateValid(0)) {
-    on<IncrementEvent>((event, emit) {
-      final value = int.tryParse(event.value);
-      if (value == null) {
-        emit(
-          CounterStateInvalid(
-            invalidValue: event.value,
-            previousValue: state.value,
-          ),
-        );
-      } else {
-        emit(
-          CounterStateValid(state.value + value),
-        );
-      }
-    });
-    on<DecrementEvent>((event, emit) {
-      final value = int.tryParse(event.value);
-      if (value == null) {
-        emit(
-          CounterStateInvalid(
-            invalidValue: event.value,
-            previousValue: state.value,
-          ),
-        );
-      } else {
-        emit(
-          CounterStateValid(state.value - value),
-        );
-      }
-    });
+    on<IncrementEvent>(_incrementNumber);
+    on<DecrementEvent>(_decrementNumber);
+  }
+  void _incrementNumber(event, emit) {
+    final value = int.tryParse(event.value);
+    if (value == null) {
+      emit(
+        CounterStateInvalid(
+          invalidValue: event.value,
+          previousValue: state.value,
+        ),
+      );
+    } else {
+      emit(
+        CounterStateValid(state.value + value),
+      );
+    }
+  }
+
+  void _decrementNumber(event, emit) {
+    final value = int.tryParse(event.value);
+    if (value == null) {
+      emit(
+        CounterStateInvalid(
+          invalidValue: event.value,
+          previousValue: state.value,
+        ),
+      );
+    } else {
+      emit(
+        CounterStateValid(state.value - value),
+      );
+    }
   }
 }
