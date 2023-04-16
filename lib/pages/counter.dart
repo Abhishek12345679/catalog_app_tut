@@ -50,7 +50,7 @@ class _CounterState extends State<Counter> {
                   ),
                   Visibility(
                     visible: state is CounterStateInvalid,
-                    child: const Text("Invalid Input"),
+                    child: Text("Invalid Input: $invalidValue"),
                   ),
                   TextField(
                     controller: _controller,
