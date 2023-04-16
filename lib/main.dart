@@ -1,3 +1,4 @@
+import 'package:catalog_app_tut/pages/counter.dart';
 import 'package:catalog_app_tut/pages/home_page.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      // home: const HomePage(),
+      home: const Counter(),
     );
   }
 }
