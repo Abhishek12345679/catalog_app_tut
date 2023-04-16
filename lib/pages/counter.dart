@@ -101,7 +101,6 @@ class _CounterState extends State<Counter> {
 @immutable
 abstract class CounterState {
   final int value;
-
   const CounterState(
     this.value,
   );
