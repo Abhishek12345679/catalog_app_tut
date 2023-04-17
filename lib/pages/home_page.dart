@@ -1,5 +1,3 @@
-import 'dart:developer' show log;
-
 import 'package:catalog_app_tut/views/email_verification_view.dart';
 import 'package:catalog_app_tut/views/login_view.dart';
 import 'package:catalog_app_tut/views/notes/main_notes_view.dart';

@@ -1,7 +1,9 @@
-import 'package:catalog_app_tut/pages/counter.dart';
 import 'package:catalog_app_tut/pages/home_page.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
+import 'package:catalog_app_tut/services/auth/bloc/auth_bloc.dart';
+import 'package:catalog_app_tut/services/auth/firebase_auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,8 +22,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: const HomePage(),
-      home: const Counter(),
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
+        child: const HomePage(),
+      ),
     );
   }
 }
