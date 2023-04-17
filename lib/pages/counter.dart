@@ -120,7 +120,7 @@ class CounterStateInvalid extends CounterState {
   }) : super(previousValue);
 }
 
-// * abstract classes are like interfaces (however all classes can be used as interfaces, only thing that differentiates abstract classes from classes is that abstract classes cannot be instantiated)
+// * "abstract classes are like interfaces" (however all classes can be used as interfaces, only thing that differentiates abstract classes from classes is that abstract classes cannot be instantiated)
 
 // super event
 @immutable
