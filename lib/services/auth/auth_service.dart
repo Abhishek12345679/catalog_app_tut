@@ -52,9 +52,4 @@ class AuthService implements AuthProvider {
   Future<void> initialize() {
     return provider.initialize();
   }
-
-  @override
-  Stream<User?> authChange() {
-    return provider.authChange();
-  }
 }

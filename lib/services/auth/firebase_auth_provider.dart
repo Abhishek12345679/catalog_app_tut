@@ -104,9 +104,4 @@ class FirebaseAuthProvider implements AuthProvider {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
   }
-
-  @override
-  Stream<User?> authChange() {
-    return FirebaseAuth.instance.authStateChanges();
-  }
 }
