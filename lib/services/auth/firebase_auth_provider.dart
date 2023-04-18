@@ -2,8 +2,7 @@ import 'package:catalog_app_tut/firebase_options.dart';
 import 'package:catalog_app_tut/services/auth/auth_exceptions.dart';
 import 'package:catalog_app_tut/services/auth/auth_provider.dart';
 import 'package:catalog_app_tut/services/auth/auth_user.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, FirebaseAuthException;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
@@ -104,5 +103,10 @@ class FirebaseAuthProvider implements AuthProvider {
   Future<void> initialize() async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
+  }
+
+  @override
+  Stream<User?> authChange() {
+    return FirebaseAuth.instance.authStateChanges();
   }
 }

@@ -2,6 +2,7 @@
 import 'package:catalog_app_tut/services/auth/auth_provider.dart';
 import 'package:catalog_app_tut/services/auth/auth_user.dart';
 import 'package:catalog_app_tut/services/auth/firebase_auth_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService implements AuthProvider {
   final AuthProvider provider;
@@ -50,5 +51,10 @@ class AuthService implements AuthProvider {
   @override
   Future<void> initialize() {
     return provider.initialize();
+  }
+
+  @override
+  Stream<User?> authChange() {
+    return provider.authChange();
   }
 }
