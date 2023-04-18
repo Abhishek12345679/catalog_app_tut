@@ -1,15 +1,16 @@
 import 'dart:developer' show log;
-
 import 'package:catalog_app_tut/enums/popup_list_option.dart';
 import 'package:catalog_app_tut/services/auth/auth_service.dart';
 import 'package:catalog_app_tut/services/auth/auth_user.dart';
+import 'package:catalog_app_tut/services/auth/bloc/auth_bloc.dart';
+import 'package:catalog_app_tut/services/auth/bloc/event/auth_event.dart';
 import 'package:catalog_app_tut/services/cloud/cloud_note.dart';
 import 'package:catalog_app_tut/services/cloud/firestore_service.dart';
 import 'package:catalog_app_tut/utilities/dialog/logout_dialog.dart';
-import 'package:catalog_app_tut/views/login_view.dart';
 import 'package:catalog_app_tut/views/notes/create_update_note_view.dart';
 import 'package:catalog_app_tut/views/notes/notes_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MainNotesView extends StatefulWidget {
   const MainNotesView({super.key});
@@ -56,19 +57,10 @@ class _MainNotesViewState extends State<MainNotesView> {
                   try {
                     final shouldLogout = await showLogoutDialog(context);
                     if (shouldLogout) {
-                      await AuthService.firebase().logOut();
                       if (context.mounted) {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginView(),
-                          ),
-                          (route) => false,
-                        );
+                        context.read<AuthBloc>().add(const AuthEventLogout());
                       }
-                      log('User with email ${currentUser.email} logged out!');
                     }
-                    log('logout cancelled XX');
                   } catch (e) {
                     log('error: $e');
                   }

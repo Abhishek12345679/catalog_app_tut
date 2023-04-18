@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:catalog_app_tut/services/auth/bloc/auth_bloc.dart';
 import 'package:catalog_app_tut/services/auth/bloc/event/auth_event.dart';
 import 'package:catalog_app_tut/services/auth/bloc/state/auth_state.dart';
@@ -19,7 +21,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        context.read<AuthBloc>().add(const AuthEventAuthChange());
+        context.read<AuthBloc>().add(
+              const AuthEventInit(),
+            );
         if (state is AuthStateLoggedIn) {
           return const MainNotesView();
         } else if (state is AuthStateLoggedOut) {

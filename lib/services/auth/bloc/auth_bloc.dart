@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:catalog_app_tut/services/auth/auth_provider.dart';
 import 'package:catalog_app_tut/services/auth/auth_user.dart';
 import 'package:catalog_app_tut/services/auth/bloc/event/auth_event.dart';
@@ -37,6 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await provider.logOut();
         emit(const AuthStateLoggedOut());
       } on Exception catch (e) {
+        log(e.toString());
         emit(AuthStateLogoutFailure(e));
       }
     });
@@ -45,8 +48,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         emit(const AuthStateLoading());
         final firebaseUserStream = provider.authChange();
-
         final user = await firebaseUserStream.first;
+
         if (user == null) {
           emit(const AuthStateLoggedOut());
         } else if (!user.emailVerified) {
