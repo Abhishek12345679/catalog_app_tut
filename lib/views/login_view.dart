@@ -1,6 +1,7 @@
 import 'package:catalog_app_tut/services/auth/auth_exceptions.dart';
 import 'package:catalog_app_tut/services/auth/bloc/auth_bloc.dart';
 import 'package:catalog_app_tut/services/auth/bloc/event/auth_event.dart';
+import 'package:catalog_app_tut/services/auth/bloc/state/auth_state.dart';
 import 'package:catalog_app_tut/utilities/dialog/error_dialog.dart';
 import 'package:catalog_app_tut/views/register_view.dart';
 import 'package:flutter/material.dart';
@@ -61,38 +62,43 @@ class _LoginViewState extends State<LoginView> {
                 autocorrect: false,
                 enableSuggestions: false,
               ),
-              TextButton(
-                onPressed: () async {
-                  try {
+              BlocListener<AuthBloc, AuthState>(
+                listener: (context, state) async {
+                  if (state is AuthStateLoggedOut) {
+                    if (state.exception is UserNotFoundAuthException) {
+                      await showErrorDialog(
+                        context,
+                        "User Not Found",
+                      );
+                    } else if (state.exception is InvalidEmailAuthException) {
+                      await showErrorDialog(
+                        context,
+                        "Enter a valid Email Address",
+                      );
+                    } else if (state.exception is WrongPasswordAuthException) {
+                      await showErrorDialog(
+                        context,
+                        "You have entered the wrong password.",
+                      );
+                    } else if (state.exception is GenericAuthException) {
+                      await showErrorDialog(
+                        context,
+                        state.exception.toString(),
+                      );
+                    }
+                  }
+                },
+                child: TextButton(
+                  onPressed: () async {
                     context.read<AuthBloc>().add(
                           AuthEventLogIn(
                             email: _email.text,
                             password: _password.text,
                           ),
                         );
-                  } on UserNotFoundAuthException {
-                    await showErrorDialog(
-                      context,
-                      "User Not Found",
-                    );
-                  } on InvalidEmailAuthException {
-                    await showErrorDialog(
-                      context,
-                      "Enter a valid Email Address",
-                    );
-                  } on WrongPasswordAuthException {
-                    await showErrorDialog(
-                      context,
-                      "You have entered the wrong password",
-                    );
-                  } on GenericAuthException catch (e) {
-                    await showErrorDialog(
-                      context,
-                      e.toString(),
-                    );
-                  }
-                },
-                child: const Text('Login'),
+                  },
+                  child: const Text('Login'),
+                ),
               ),
               TextButton(
                 autofocus: true,
