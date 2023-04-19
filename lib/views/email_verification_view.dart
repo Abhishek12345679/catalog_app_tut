@@ -1,6 +1,7 @@
-import 'package:catalog_app_tut/services/auth/auth_service.dart';
-import 'package:catalog_app_tut/views/register_view.dart';
+import 'package:catalog_app_tut/services/auth/bloc/auth_bloc.dart';
+import 'package:catalog_app_tut/services/auth/bloc/event/auth_event.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EmailVerificationView extends StatelessWidget {
   const EmailVerificationView({
@@ -26,20 +27,14 @@ class EmailVerificationView extends StatelessWidget {
             ),
             TextButton(
               child: const Text('Send Verification Code'),
-              onPressed: () async {
-                await AuthService.firebase().sendVerificationEmail();
+              onPressed: () {
+                context.read<AuthBloc>().add(const AuthEventShouldRegister());
               },
             ),
             TextButton(
               child: const Text('Restart'),
-              onPressed: () async {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RegisterView(),
-                  ),
-                  (route) => false,
-                );
+              onPressed: () {
+                context.read<AuthBloc>().add(const AuthEventShouldRegister());
               },
             ),
           ],
