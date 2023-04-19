@@ -16,7 +16,6 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  bool isLoggingIn = false;
 
   @override
   void initState() {
@@ -37,15 +36,6 @@ class _LoginViewState extends State<LoginView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
-          if (!state.isLoading) {
-            setState(() {
-              isLoggingIn = false;
-            });
-          } else {
-            setState(() {
-              isLoggingIn = true;
-            });
-          }
           if (state.exception is UserNotFoundAuthException) {
             await showErrorDialog(
               context,
@@ -64,7 +54,7 @@ class _LoginViewState extends State<LoginView> {
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(
               context,
-              state.exception.toString(),
+              "Authentication Problem",
             );
           }
         }
@@ -97,17 +87,24 @@ class _LoginViewState extends State<LoginView> {
                   autocorrect: false,
                   enableSuggestions: false,
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    context.read<AuthBloc>().add(
-                          AuthEventLogIn(
-                            email: _email.text,
-                            password: _password.text,
-                          ),
-                        );
+                BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    return ElevatedButton(
+                      onPressed: () async {
+                        context.read<AuthBloc>().add(
+                              AuthEventLogIn(
+                                email: _email.text,
+                                password: _password.text,
+                              ),
+                            );
+                      },
+                      child: (state is AuthStateLoggedOut && state.isLoading)
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text('Login'),
+                    );
                   },
-                  child:
-                      isLoggingIn ? const Text('loading') : const Text('Login'),
                 ),
                 TextButton(
                   autofocus: true,
