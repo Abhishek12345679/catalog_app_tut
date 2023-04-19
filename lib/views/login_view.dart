@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:catalog_app_tut/services/auth/auth_exceptions.dart';
 import 'package:catalog_app_tut/services/auth/bloc/auth_bloc.dart';
 import 'package:catalog_app_tut/services/auth/bloc/event/auth_event.dart';
@@ -17,6 +19,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  bool isLoggingIn = false;
 
   @override
   void initState() {
@@ -65,6 +68,9 @@ class _LoginViewState extends State<LoginView> {
               BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) async {
                   if (state is AuthStateLoggedOut) {
+                    setState(() {
+                      isLoggingIn = false;
+                    });
                     if (state.exception is UserNotFoundAuthException) {
                       await showErrorDialog(
                         context,
@@ -86,9 +92,18 @@ class _LoginViewState extends State<LoginView> {
                         state.exception.toString(),
                       );
                     }
+                  } else if (state is AuthStateLoading) {
+                    setState(() {
+                      isLoggingIn = true;
+                    });
+                    // log('loading');
+                  } else if (state is AuthStateLoggedIn) {
+                    setState(() {
+                      isLoggingIn = false;
+                    });
                   }
                 },
-                child: TextButton(
+                child: ElevatedButton(
                   onPressed: () async {
                     context.read<AuthBloc>().add(
                           AuthEventLogIn(
@@ -97,7 +112,11 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         );
                   },
-                  child: const Text('Login'),
+                  child: isLoggingIn
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text('Login'),
                 ),
               ),
               TextButton(

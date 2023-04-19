@@ -6,7 +6,7 @@ import 'package:catalog_app_tut/services/auth/bloc/state/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(AuthProvider provider) : super(const AuthStateLoading()) {
+  AuthBloc(AuthProvider provider) : super(const AuthStateLoggedOut(null)) {
     on<AuthEventInit>((_, emit) async {
       await provider.initialize();
       final user = provider.currentUser;
@@ -33,12 +33,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<AuthEventLogout>((event, emit) async {
       try {
-        emit(const AuthStateLoading());
         await provider.logOut();
         emit(const AuthStateLoggedOut(null));
       } on Exception catch (e) {
         log(e.toString());
-        emit(AuthStateLogoutFailure(e));
+        // emit(AuthStateLogoutFailure(e));
       }
     });
   }
